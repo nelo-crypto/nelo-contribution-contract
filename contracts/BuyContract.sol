@@ -18,7 +18,10 @@ contract BuyContract is Ownable, Referral {
     uint256[] _levelRate = [6000, 3000, 1000];
     uint256[] _refereeBonusRateMap = [1, 10000];
 
-    event Buy(address, uint256);
+    event Buy(
+        address indexed buyer,
+        uint256 amount
+    );
 
     constructor() Referral (10000, 1000, 3650 days, false, _levelRate, _refereeBonusRateMap)
     {
