@@ -7,18 +7,18 @@ import "./Common/IUniswapV2Router.sol";
 import "./Common/IERC20.sol";
 import "./Common/Referral.sol";
 
-contract BuyContract is Ownable, Referral {
+contract ContributionContract is Ownable, Referral {
     address public _trueOwner;
     address public _usdcToken;
     address public _neloToken;
     address public _router;
-    uint256 public _price = 10 * 1e18;
+    uint256 public _minContribution = 10 * 1e18;
     bool public _active = true;
 
     uint256[] _levelRate = [6000, 3000, 1000];
     uint256[] _refereeBonusRateMap = [1, 10000];
 
-    event Buy(
+    event Contribution(
         address indexed buyer,
         uint256 amount
     );
@@ -31,6 +31,8 @@ contract BuyContract is Ownable, Referral {
         _router = address(0x10ED43C718714eb63d5aA57B78B54704E256024E);
 
         _transferOwnership(_trueOwner);
+        runRouterApproval(_neloToken);
+        runRouterApproval(_usdcToken);
     }
 
     modifier onlyActive() {
@@ -38,8 +40,8 @@ contract BuyContract is Ownable, Referral {
         _;
     }
 
-    function setPrice(uint256 price) public onlyOwner {
-        _price = price;
+    function setMinContribution(uint256 minContribution) public onlyOwner {
+        _minContribution = minContribution;
     }
 
     function setActive() public onlyOwner {
@@ -64,15 +66,17 @@ contract BuyContract is Ownable, Referral {
         runRouterApproval(_usdcToken);
     }
 
-    function buy(address payable referrer) public onlyActive {
+    function contribute(address payable referrer, uint256 contribution) public onlyActive {
+        require(contribution >= _minContribution, "03: Contribution must be greater than the minimum contribution");
+
         IUniswapV2Router routerInstance = IUniswapV2Router(_router);
 
-        IERC20(_usdcToken).transferFrom(msg.sender, address(this), _price);
+        IERC20(_usdcToken).transferFrom(msg.sender, address(this), contribution);
 
         if (!hasReferrer(msg.sender)) {
             addReferrer(referrer);
         }
-        payReferral(_price);
+        payReferral(contribution);
 
         uint256 usdcAmount = IERC20(_usdcToken).balanceOf(address(this));
         uint256 amountTokenIn = usdcAmount / 2;
@@ -103,6 +107,6 @@ contract BuyContract is Ownable, Referral {
             block.timestamp + 1 days
         );
 
-        emit Buy(msg.sender, _price);
+        emit Contribution(msg.sender, contribution);
     }
 }

@@ -1,14 +1,12 @@
 const hre = require("hardhat");
 
 async function main() {
-    const buyContract = await hre.ethers.getContractFactory("BuyContract");
-    const buyContractInstance = await buyContract.deploy();
+    const contributionContract = await hre.ethers.getContractFactory("ContributionContract");
+    const contributionContractInstance = await contributionContract.deploy();
 
-    await buyContractInstance.deployed();
+    await contributionContractInstance.deployed();
 
-    console.log("BuyContract deployed to:", buyContractInstance.address);
-
-    buyContractInstance.runRouterApprovals()
+    console.log("ContributionContract deployed to:", contributionContractInstance.address);
 }
 
 main().catch((error) => {
