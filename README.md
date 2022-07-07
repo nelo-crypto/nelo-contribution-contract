@@ -1,6 +1,6 @@
-# Nelo Buy Contracts
+# NELO Contribution Contract
 
-This repository holds the contracts used to buy the NELO token through the app.
+This repository holds the contribution contract used to buy the NELO token through the app.
 
 Supports a three level referral system.
 
